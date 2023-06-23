@@ -15,7 +15,7 @@ struct ToDoItem {
     let text : String
     let importance : Importance
     let deadline : Date?
-    let isDone : Bool
+    var isDone : Bool
     let createdDate : Date
     let dateOfChange : Date?
     
@@ -25,7 +25,7 @@ struct ToDoItem {
         case high = "важная"
     }
     
-    init(id: String = UUID().uuidString, text: String, importance: Importance, deadline: Date?, isDone: Bool, createdDate: Date, dateOfChange: Date?) {
+    init(id: String = UUID().uuidString, text: String, importance: Importance, deadline: Date? = nil, isDone: Bool = false, createdDate: Date = Date(), dateOfChange: Date? = nil) {
         self.id = id
         self.text = text
         self.importance = importance
@@ -54,7 +54,6 @@ extension ToDoItem {
         let importanceRowValue = dict["importance"] as? String ?? ""
         let importance = Importance(rawValue : importanceRowValue) ?? .normal
         
-        
         var deadline: Date?
         if let deadlineTimestamp = dict["deadline"] as? Double {
             deadline = Date(timeIntervalSince1970: deadlineTimestamp)
@@ -66,10 +65,6 @@ extension ToDoItem {
         if let dateOfChangeTimestamp = dict["dateOfChange"] as? Double {
             dateOfChange = Date(timeIntervalSince1970: dateOfChangeTimestamp)
         }
-        
-        
-        
-        
         
         return ToDoItem(id: id, text: text, importance: importance, deadline: deadline, isDone: isDone, createdDate: createdDate, dateOfChange: dateOfChange)
     }
@@ -94,9 +89,6 @@ extension ToDoItem {
         if importance != .normal {
             dict["importance"] = importance.rawValue
         }
-        
-        
-        
         
         return dict
     }
@@ -157,11 +149,13 @@ extension ToDoItem {
     var csvString: String {
         var csv = "\(id),\(text),"
         let importance = importance.rawValue
+        
         if importance == "обычная" {
             csv += ","
         }else{
             csv += "\(importance),"
         }
+        
         if let deadline = deadline {
             csv += "\(deadline.timeIntervalSince1970),"
         } else {
@@ -169,11 +163,13 @@ extension ToDoItem {
         }
         
         csv += "\(isDone),\(createdDate.timeIntervalSince1970)"
+        
         if let dateOfChange = dateOfChange {
             csv += ",\(dateOfChange.timeIntervalSince1970)\n"
         }else{
             csv += ",\n"
         }
+        
         return csv
     }
 }
