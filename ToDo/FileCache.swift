@@ -55,7 +55,6 @@ final class FileCache {
         let fileManager = FileManager.default
         
         if !fileManager.fileExists(atPath: filepath) {
-            // Create a new file
             fileManager.createFile(atPath: filepath, contents: nil, attributes: nil)
             print("New file created at \(filepath)")
         }
@@ -79,6 +78,11 @@ final class FileCache {
         }catch {
             print("Failed to load todo items from file. Error: \(error)")
         }
+    }
+    
+    func completedTask(id: String) {
+        guard let index = todoItems.firstIndex(where: { $0.id == id }) else { return }
+        todoItems[index].isDone = true
     }
 }
 
@@ -107,12 +111,10 @@ extension FileCache {
     func loadFromCSVFile() {
         do {
             guard let csvString = try? String(contentsOf: URL(fileURLWithPath: filepath)) else{
-                print("No existing file found at")
+                print("No existing file found at \(filepath)")
                 return
             }
             todoItems = ToDoItem.parse(csv: csvString)
-        }catch {
-            print("Failed to load CSV file: \(error)")
         }
     }
 }

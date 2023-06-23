@@ -8,6 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		D5560BC82A3C322B001D1F41 /* FileCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5560BC72A3C322B001D1F41 /* FileCacheTests.swift */; };
+		D5A3F8F42A3EE0620032083B /* ToDoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A3F8F32A3EE0620032083B /* ToDoCell.swift */; };
+		D5A3F8F72A3EE0AD0032083B /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D5A3F8F62A3EE0AD0032083B /* SnapKit */; };
+		D5A3F8F92A409C170032083B /* AddTaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A3F8F82A409C170032083B /* AddTaskViewController.swift */; };
+		D5A3F8FD2A41693A0032083B /* sss.csv in Resources */ = {isa = PBXBuildFile; fileRef = D5A3F8FC2A41693A0032083B /* sss.csv */; };
+		D5AAF8762A45A91E00C40B67 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AAF8752A45A91E00C40B67 /* TextView.swift */; };
+		D5AAF87A2A45BFD700C40B67 /* PriorityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AAF8792A45BFD700C40B67 /* PriorityView.swift */; };
+		D5AAF87C2A45C1D200C40B67 /* DeadlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AAF87B2A45C1D200C40B67 /* DeadlineView.swift */; };
+		D5AAF87E2A45C29900C40B67 /* DividerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AAF87D2A45C29900C40B67 /* DividerView.swift */; };
+		D5AAF8812A460B8A00C40B67 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AAF8802A460B8A00C40B67 /* CalendarView.swift */; };
 		D5CE149C2A3C7CA70098F174 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5CE149B2A3C7CA70098F174 /* TodoItem.swift */; };
 		D5CE149E2A3C7D180098F174 /* FileCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5CE149D2A3C7D180098F174 /* FileCache.swift */; };
 		D5CFBE1F2A36CAFF004AE4C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5CFBE1E2A36CAFF004AE4C6 /* AppDelegate.swift */; };
@@ -39,6 +48,14 @@
 
 /* Begin PBXFileReference section */
 		D5560BC72A3C322B001D1F41 /* FileCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCacheTests.swift; sourceTree = "<group>"; };
+		D5A3F8F32A3EE0620032083B /* ToDoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoCell.swift; sourceTree = "<group>"; };
+		D5A3F8F82A409C170032083B /* AddTaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskViewController.swift; sourceTree = "<group>"; };
+		D5A3F8FC2A41693A0032083B /* sss.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sss.csv; sourceTree = "<group>"; };
+		D5AAF8752A45A91E00C40B67 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
+		D5AAF8792A45BFD700C40B67 /* PriorityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriorityView.swift; sourceTree = "<group>"; };
+		D5AAF87B2A45C1D200C40B67 /* DeadlineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeadlineView.swift; sourceTree = "<group>"; };
+		D5AAF87D2A45C29900C40B67 /* DividerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerView.swift; sourceTree = "<group>"; };
+		D5AAF8802A460B8A00C40B67 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		D5CE149B2A3C7CA70098F174 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
 		D5CE149D2A3C7D180098F174 /* FileCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCache.swift; sourceTree = "<group>"; };
 		D5CFBE1B2A36CAFF004AE4C6 /* ToDo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -60,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5A3F8F72A3EE0AD0032083B /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,9 +98,49 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D5AAF86F2A45A79900C40B67 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D5AAF8752A45A91E00C40B67 /* TextView.swift */,
+				D5AAF8792A45BFD700C40B67 /* PriorityView.swift */,
+				D5AAF87B2A45C1D200C40B67 /* DeadlineView.swift */,
+				D5AAF87D2A45C29900C40B67 /* DividerView.swift */,
+				D5AAF8802A460B8A00C40B67 /* CalendarView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D5AAF8702A45A7C300C40B67 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				D5CE149B2A3C7CA70098F174 /* TodoItem.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		D5AAF8722A45A7D800C40B67 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				D5CFBE222A36CAFF004AE4C6 /* ViewController.swift */,
+				D5A3F8F82A409C170032083B /* AddTaskViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		D5AAF8742A45A8C400C40B67 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
 		D5CFBE122A36CAFF004AE4C6 = {
 			isa = PBXGroup;
 			children = (
+				D5AAF8742A45A8C400C40B67 /* Constants */,
+				D5AAF8722A45A7D800C40B67 /* Controllers */,
+				D5AAF8702A45A7C300C40B67 /* Model */,
+				D5AAF86F2A45A79900C40B67 /* Views */,
 				D5CFBE1D2A36CAFF004AE4C6 /* ToDo */,
 				D5CFBE342A36CB02004AE4C6 /* ToDoTests */,
 				D5CFBE3E2A36CB02004AE4C6 /* ToDoUITests */,
@@ -105,9 +163,9 @@
 			children = (
 				D5CFBE1E2A36CAFF004AE4C6 /* AppDelegate.swift */,
 				D5CFBE202A36CAFF004AE4C6 /* SceneDelegate.swift */,
-				D5CFBE222A36CAFF004AE4C6 /* ViewController.swift */,
-				D5CE149B2A3C7CA70098F174 /* TodoItem.swift */,
 				D5CE149D2A3C7D180098F174 /* FileCache.swift */,
+				D5A3F8F32A3EE0620032083B /* ToDoCell.swift */,
+				D5A3F8FC2A41693A0032083B /* sss.csv */,
 				D5CFBE272A36CB01004AE4C6 /* Assets.xcassets */,
 				D5CFBE292A36CB01004AE4C6 /* LaunchScreen.storyboard */,
 				D5CFBE2C2A36CB01004AE4C6 /* Info.plist */,
@@ -150,6 +208,7 @@
 			);
 			name = ToDo;
 			packageProductDependencies = (
+				D5A3F8F62A3EE0AD0032083B /* SnapKit */,
 			);
 			productName = ToDo;
 			productReference = D5CFBE1B2A36CAFF004AE4C6 /* ToDo.app */;
@@ -224,6 +283,7 @@
 			);
 			mainGroup = D5CFBE122A36CAFF004AE4C6;
 			packageReferences = (
+				D5A3F8F52A3EE0AD0032083B /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			productRefGroup = D5CFBE1C2A36CAFF004AE4C6 /* Products */;
 			projectDirPath = "";
@@ -241,6 +301,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5A3F8FD2A41693A0032083B /* sss.csv in Resources */,
 				D5CFBE2B2A36CB01004AE4C6 /* LaunchScreen.storyboard in Resources */,
 				D5CFBE282A36CB01004AE4C6 /* Assets.xcassets in Resources */,
 			);
@@ -268,10 +329,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5CFBE232A36CAFF004AE4C6 /* ViewController.swift in Sources */,
+				D5AAF8762A45A91E00C40B67 /* TextView.swift in Sources */,
+				D5AAF8812A460B8A00C40B67 /* CalendarView.swift in Sources */,
+				D5AAF87A2A45BFD700C40B67 /* PriorityView.swift in Sources */,
+				D5A3F8F42A3EE0620032083B /* ToDoCell.swift in Sources */,
 				D5CFBE1F2A36CAFF004AE4C6 /* AppDelegate.swift in Sources */,
 				D5CE149C2A3C7CA70098F174 /* TodoItem.swift in Sources */,
 				D5CE149E2A3C7D180098F174 /* FileCache.swift in Sources */,
+				D5AAF87C2A45C1D200C40B67 /* DeadlineView.swift in Sources */,
 				D5CFBE212A36CAFF004AE4C6 /* SceneDelegate.swift in Sources */,
+				D5AAF87E2A45C29900C40B67 /* DividerView.swift in Sources */,
+				D5A3F8F92A409C170032083B /* AddTaskViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -441,6 +509,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BVY46J77S7;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ToDo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -467,6 +536,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BVY46J77S7;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ToDo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -598,6 +668,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D5A3F8F52A3EE0AD0032083B /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D5A3F8F62A3EE0AD0032083B /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D5A3F8F52A3EE0AD0032083B /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D5CFBE132A36CAFF004AE4C6 /* Project object */;
 }
