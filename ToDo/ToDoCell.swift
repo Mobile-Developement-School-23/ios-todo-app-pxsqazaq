@@ -8,60 +8,68 @@
 import UIKit
 import SnapKit
 
+protocol ToDoCellDelegate: AnyObject {
+    func radioButtonTapped(cell: ToDoCell)
+}
+
+
 class ToDoCell: UITableViewCell {
-    
+
+    weak var delegate: ToDoCellDelegate?
     static let identifier = "ToDoCell"
-    
     private var isDone: Bool = false
     private var importance: String = ""
     
     private var toDoText : UILabel = {
         let text = UILabel()
         text.numberOfLines = 3
-        text.textColor = .black
+        text.textColor = Colors.labelPrimary.color
         text.lineBreakMode = .byTruncatingTail
-        text.font = UIFont.systemFont(ofSize: 17)
+        text.font = GlobalConstants.body
         return text
     }()
     
     private var deadline : UILabel = {
         let deadline = UILabel()
-        deadline.text = "31 July"
-        deadline.textColor = .lightGray
-        deadline.font = UIFont.systemFont(ofSize: 15)
+        deadline.textColor = Colors.labelTertiary.color
+        deadline.font = GlobalConstants.subhead
         return deadline
     }()
     
     private let calendarIcon : UIImageView = {
         let image = UIImageView()
+        image.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         image.image = UIImage(named: "Calendar")
         return image
     }()
     
     private let chevronIcon : UIImageView = {
         let image = UIImageView()
-        image.image = UIImage(named: "Chevron")
+        image.image = UIImage(named: "present")
         return image
     }()
     
     private let priorityIcon : UIImageView = {
         let image = UIImageView()
         image.contentMode = .scaleAspectFit
+        image.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         return image
     }()
-
-    private let isDoneIcon : UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "notDone")
-        return imageView
+    
+    private let radioButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(named: "done"), for: .normal)
+        button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        button.addTarget(self, action: #selector(radioButtonTapped), for: .touchUpInside)
+        return button
     }()
-    lazy var stackView : UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [isDoneIcon, priorityIcon])
-        stack.spacing = 15
+
+    lazy var stackViewItem : UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [priorityIcon, toDoText])
+        stack.spacing = 5
         stack.axis = .horizontal
         return stack
     }()
-    
     
     lazy var stackViewDeadline : UIStackView = {
         let stackViewDeadline = UIStackView(arrangedSubviews: [calendarIcon, deadline])
@@ -70,99 +78,79 @@ class ToDoCell: UITableViewCell {
         return stackViewDeadline
     }()
     
+    lazy var stackAll: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [stackViewItem, stackViewDeadline])
+        stack.axis = .vertical
+        stack.spacing = 2
+        return stack
+    }()
     
-    private func setupUI() {
-        self.contentView.addSubview(stackView)
-        self.contentView.addSubview(chevronIcon)
-        self.contentView.addSubview(deadline)
-        
-        
-        
-        chevronIcon.snp.makeConstraints {
-            $0.height.equalTo(12)
-            $0.width.equalTo(7)
-            $0.right.equalToSuperview().offset(-16)
-            $0.centerY.equalToSuperview()
-        }
-        
-        stackView.snp.makeConstraints {
-            $0.left.equalToSuperview().offset(16)
-            $0.height.equalTo(24)
-            $0.centerY.equalToSuperview()
-        }
-        
-        isDoneIcon.snp.makeConstraints {
-            $0.height.width.equalTo(24)
-            $0.centerY.equalToSuperview()
-        }
-        
-        priorityIcon.snp.makeConstraints {
-            $0.height.equalTo(16)
-            $0.width.equalTo(10)
-        }
-        
-        calendarIcon.snp.makeConstraints {
-            $0.width.height.equalTo(16)
-        }
-        
-        
+    override func prepareForReuse() {
+        toDoText.attributedText = nil
+        toDoText.textColor = Colors.labelPrimary.color
     }
     
-    lazy var stackTask: UIStackView = {
-        let stackTask = UIStackView()
-        stackTask.axis = .vertical
-        return stackTask
-    }()
+    private func setupUI() {
+        
+        self.contentView.addSubview(radioButton)
+        self.contentView.addSubview(stackAll)
+        self.contentView.addSubview(chevronIcon)
+        
+        radioButton.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.left.equalToSuperview().offset(16)
+        }
+        
+        chevronIcon.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.right.equalToSuperview().offset(-16)
+        }
+        
+        stackAll.snp.makeConstraints {
+            $0.left.equalTo(radioButton.snp.right).offset(12)
+            $0.top.bottom.equalToSuperview().inset(16)
+            $0.right.equalToSuperview().offset(-39)
+        }
+    }
+    
     func withDeadline(deadline: Date) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMM"
         self.deadline.text = dateFormatter.string(from: deadline)
-        self.contentView.addSubview(stackTask)
-        stackTask.addArrangedSubview(toDoText)
-        stackTask.addArrangedSubview(stackViewDeadline)
-        stackTask.snp.makeConstraints {
-            $0.left.equalTo(stackView.snp.right).offset(5)
-            $0.centerY.equalToSuperview()
-            $0.right.equalToSuperview().offset(-39)
-            $0.top.bottom.equalToSuperview().inset(16)
-        }
+        stackViewDeadline.isHidden = false
     }
     
     func withoutDeadline() {
-        stackTask.removeFromSuperview()
-        toDoText.removeFromSuperview()
-        self.contentView.addSubview(toDoText)
-        toDoText.snp.makeConstraints {
-            $0.left.equalTo(stackView.snp.right).offset(5)
-            $0.centerY.equalToSuperview()
-            $0.top.bottom.equalToSuperview().inset(16)
-            $0.right.equalToSuperview().offset(-39)
-        }
-        toDoText.numberOfLines = 3
-           toDoText.lineBreakMode = .byTruncatingTail
+        stackViewDeadline.isHidden = true
+    }
+    
+    private func makeStrikeThrough(label: UILabel) {
+        let attributedString = NSAttributedString(string: label.text ?? "", attributes: [
+            NSAttributedString.Key.strikethroughStyle: NSUnderlineStyle.single.rawValue
+        ])
+        label.attributedText = attributedString
     }
     
     func donetext(label: UILabel) {
         self.priorityIcon.isHidden = true
-        isDoneIcon.image = UIImage(named: "done")
+        radioButton.setImage(UIImage(named: "done"), for: .normal)
+        makeStrikeThrough(label: label)
         label.textColor = .lightGray
     }
-
+    
     func prioritytext(label: UILabel) {
-        label.textColor = .black
-        isDoneIcon.image = UIImage(named: "priority")
+        radioButton.setImage(UIImage(named: "priority"), for: .normal)
         priorityIcon.image = UIImage(named: "highicon")
         self.priorityIcon.isHidden = false
-
+        
     }
-
+    
     func lowtext(label: UILabel) {
-        label.textColor = .black
-        self.isDoneIcon.image = UIImage(named: "notDone")
-        self.priorityIcon.image = UIImage(named: "low")
+        radioButton.setImage(UIImage(named: "Ellipse 1"), for: .normal)
+        self.priorityIcon.image = UIImage(named: "low2")
         self.priorityIcon.isHidden = false
     }
-
+    
     func configure(with viewModel: ToDoItem) {
         self.toDoText.text = viewModel.text
         self.isDone = viewModel.isDone
@@ -173,20 +161,23 @@ class ToDoCell: UITableViewCell {
         else{
             withoutDeadline()
         }
-            if self.isDone {
-                donetext(label: self.toDoText)
-            } else if self.importance == "важная" {
-                prioritytext(label: self.toDoText)
-            } else if self.importance == "неважная"{
-                lowtext(label: self.toDoText)
-            }
-            else {
-                self.isDoneIcon.image = UIImage(named: "notDone")
-                self.toDoText.textColor = .black
-                self.priorityIcon.isHidden = true
-                
-            }
+        if self.isDone {
+            donetext(label: self.toDoText)
+        } else if self.importance == "важная" {
+            prioritytext(label: self.toDoText)
+        } else if self.importance == "неважная"{
+            lowtext(label: self.toDoText)
+        }
+        else {
+            radioButton.setImage(UIImage(named: "Ellipse 1"), for: .normal)
+            self.priorityIcon.isHidden = true
+        }
     }
+    
+    @objc private func radioButtonTapped() {
+        delegate?.radioButtonTapped(cell: self)
+    }
+
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

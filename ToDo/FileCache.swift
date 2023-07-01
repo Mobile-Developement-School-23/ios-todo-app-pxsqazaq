@@ -8,6 +8,12 @@
 import Foundation
 
 
+enum FileCacheError: Error {
+    case notFound
+    case notSupported
+    case failedToRead
+    case failedToWrite
+}
 // MARK: - FileCache realization
 
 final class FileCache {
@@ -25,6 +31,13 @@ final class FileCache {
             return
         }
         todoItems.append(todoItem)
+    }
+    
+    func update(id: String, text: String, importance: Importance, deadline: Date?) {
+        guard let index = todoItems.firstIndex(where: { $0.id == id }) else { return }
+        todoItems[index].text = text
+        todoItems[index].importance = importance
+        todoItems[index].deadline = deadline
     }
     
     func remove(id: String) {
@@ -84,6 +97,11 @@ final class FileCache {
         guard let index = todoItems.firstIndex(where: { $0.id == id }) else { return }
         todoItems[index].isDone = true
     }
+    
+    func notCompleteTask(id: String) {
+        guard let index = todoItems.firstIndex(where: { $0.id == id }) else { return }
+        todoItems[index].isDone = false
+    }
 }
 
 
@@ -93,7 +111,7 @@ final class FileCache {
 
 extension FileCache {
     func saveToCSVFile() {
-        var csvString = "ID,Text,Importance,Deadline,IsCompleted,CreationDate\n"
+        var csvString = "ID,Text,Importance,Deadline,IsCompleted,CreationDate,DateOfChange\n"
         
         for item in todoItems {
             csvString += item.csvString

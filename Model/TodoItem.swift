@@ -12,20 +12,16 @@ import Foundation
 
 struct ToDoItem {
     let id : String
-    let text : String
-    let importance : Importance
-    let deadline : Date?
+    var text : String
+    var importance : Importance
+    var deadline : Date?
     var isDone : Bool
     let createdDate : Date
     let dateOfChange : Date?
     
-    enum Importance : String {
-        case low = "неважная"
-        case normal = "обычная"
-        case high = "важная"
-    }
     
-    init(id: String = UUID().uuidString, text: String, importance: Importance, deadline: Date? = nil, isDone: Bool = false, createdDate: Date = Date(), dateOfChange: Date? = nil) {
+    
+    init(id: String = UUID().uuidString, text: String, importance: Importance = .normal, deadline: Date? = nil, isDone: Bool = false, createdDate: Date = Date(), dateOfChange: Date? = nil) {
         self.id = id
         self.text = text
         self.importance = importance
@@ -35,6 +31,12 @@ struct ToDoItem {
         self.dateOfChange = dateOfChange
         
     }
+}
+
+enum Importance : String {
+    case low = "неважная"
+    case normal = "обычная"
+    case high = "важная"
 }
 
 // MARK: - JSON Parsing
@@ -124,7 +126,6 @@ extension ToDoItem {
                 
                 if let isDone = Bool(isDoneString),
                    let createdDate = stringToDate(from: creationDateString){
-                    let dateOfChange = stringToDate(from: dateOfChangeString)
                     let importance = Importance(rawValue: importanceString)
                     let deadline = stringToDate(from: deadlineString)
                     let item = ToDoItem(
@@ -134,7 +135,7 @@ extension ToDoItem {
                         deadline: deadline,
                         isDone: isDone,
                         createdDate: createdDate,
-                        dateOfChange: dateOfChange
+                        dateOfChange: stringToDate(from: dateOfChangeString)
                     )
                     items.append(item)
                 } else {
