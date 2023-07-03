@@ -5,7 +5,7 @@ class ViewController: UIViewController {
     let tableView = UITableView()
     let completed = UILabel()
     var data: [ToDoItem] = []
-    var n: Int = 0
+    var completedTasks: Int = 0
     let show = UIButton(type: .system)
     let file = FileCache(filepath: "/Users/new/Desktop/ToDo/ToDo/sss.csv")
 

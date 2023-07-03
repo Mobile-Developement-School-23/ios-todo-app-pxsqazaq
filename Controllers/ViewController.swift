@@ -1,6 +1,6 @@
 import UIKit
 
-class ViewController: UIViewController, newItem {
+class ViewController: UIViewController, AddItemDelegate {
     func newTask(item: ToDoItem) {
         if(checkNewItem) {
             file.add(todoItem: item)
@@ -32,7 +32,7 @@ class ViewController: UIViewController, newItem {
             tableView.reloadData()
         }
     }
-    var n: Int = 0
+    var completedTasks: Int = 0
     var file = FileCache(filepath: "/Users/new/Desktop/ToDo/ToDo/sss.json")
     
     override func viewDidLoad() {
@@ -49,8 +49,8 @@ class ViewController: UIViewController, newItem {
     
     private func updateCompletedCount() {
         let completedCount = file.todoItems.filter { $0.isDone == true }.count
-        n = completedCount
-        completed.text = "Выполнено — \(n)"
+        completedTasks = completedCount
+        completed.text = "Выполнено — \(completedTasks)"
     }
     
     private func showNotCompletedTasks() {
@@ -110,7 +110,7 @@ class ViewController: UIViewController, newItem {
     
     private func makeCompleted() -> UILabel {
         let label = UILabel()
-        label.text = "Выполнено — \(n)"
+        label.text = "Выполнено — \(completedTasks)"
         label.font = UIFont.systemFont(ofSize: 16)
         label.textColor = Colors.colorGray.color
         return label

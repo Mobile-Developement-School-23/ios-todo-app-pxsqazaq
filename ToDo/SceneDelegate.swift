@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import CocoaLumberjackSwift
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    let fileLogger: DDFileLogger = DDFileLogger()
+    
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -22,6 +25,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.makeKeyAndVisible()
         
     }
+    
+    private func setupLogger() {
+            DDLog.add(DDTTYLogger.sharedInstance!)
+                
+            // File logger
+            fileLogger.rollingFrequency = TimeInterval(60*60*24)
+            fileLogger.logFileManager.maximumNumberOfLogFiles = 7
+            DDLog.add(fileLogger, with: .info)
+        }
 
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.

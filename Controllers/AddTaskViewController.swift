@@ -6,7 +6,7 @@
 //
 import UIKit
 
-protocol newItem {
+protocol AddItemDelegate {
     func newTask(item: ToDoItem)
     func didDelete(_: AddTodoController, item: ToDoItem)
 }
@@ -14,7 +14,7 @@ protocol newItem {
 class AddTodoController: UIViewController {
     
     // MARK: - Properties
-    var delegate: newItem?
+    var delegate: AddItemDelegate?
         
     private enum Constants {
         static let cancelTitle = "Отменить"
