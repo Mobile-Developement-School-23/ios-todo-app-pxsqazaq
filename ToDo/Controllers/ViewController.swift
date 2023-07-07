@@ -48,7 +48,6 @@ class ViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.isScrollEnabled = false
 
-
         self.title = "Мои дела"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
@@ -153,11 +152,11 @@ extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {}
 
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let actionInfo = UIContextualAction(style: .normal, title: "") { (action, view, completionHandler) in
+        let actionInfo = UIContextualAction(style: .normal, title: "") { (_, _, completionHandler) in
             completionHandler(true)
         }
         actionInfo.image = UIImage(systemName: "info.circle.fill")
-        let actionRemove = UIContextualAction(style: .destructive, title: "") { (action, view, completionHandler) in
+        let actionRemove = UIContextualAction(style: .destructive, title: "") { (_, _, completionHandler) in
             let id = self.data[indexPath.row].id
             self.file.remove(id: "\(id)")
             self.file.saveToCSVFile()
@@ -170,7 +169,7 @@ extension ViewController: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let actionDone = UIContextualAction(style: .normal, title: "") { (action, view, completionHandler) in
+        let actionDone = UIContextualAction(style: .normal, title: "") { (_, _, completionHandler) in
             let id = self.data[indexPath.row].id
             self.file.completedTask(id: id)
             self.file.saveToCSVFile()

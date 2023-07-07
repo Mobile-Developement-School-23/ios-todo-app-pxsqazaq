@@ -23,7 +23,7 @@ enum DSImage {
 
 extension DSImage {
     var image: UIImage {
-        var image: UIImage? = nil
+        var image: UIImage?
         
         switch self {
         case .plusCircle:

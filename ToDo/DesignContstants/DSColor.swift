@@ -29,7 +29,7 @@ enum DSColor {
 
 extension DSColor {
     var color: UIColor {
-        var color: UIColor? = nil
+        var color: UIColor?
         
         switch self {
         case .backElevated:
@@ -71,4 +71,3 @@ extension DSColor {
         return color ?? UIColor()
     }
 }
-

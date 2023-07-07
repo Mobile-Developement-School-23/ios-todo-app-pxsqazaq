@@ -5,10 +5,10 @@
 ////  Created by Arystan on 19.06.2023.
 ////
 //
-//import UIKit
-//import SnapKit
+// import UIKit
+// import SnapKit
 //
-//class AddTaskViewController: UIViewController, UITextViewDelegate {
+// class AddTaskViewController: UIViewController, UITextViewDelegate {
 //    
 //    let initialHeight: CGFloat = 120
 //    
@@ -145,11 +145,11 @@
 //            self.view.layoutIfNeeded()
 //        }
 //    }
-//}
+// }
 //
 //
 //
-//extension UITextView {
+// extension UITextView {
 //    func addPlaceholder(text: String) {
 //        let placeholderLabel = UILabel()
 //        placeholderLabel.text = text
@@ -179,7 +179,7 @@
 //            placeholderLabel.isHidden = !self.text.isEmpty
 //        }
 //    }
-//}
+// }
 //
 //
 //

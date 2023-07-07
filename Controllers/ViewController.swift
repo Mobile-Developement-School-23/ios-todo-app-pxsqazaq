@@ -1,64 +1,128 @@
 import UIKit
 
+@MainActor
 class ViewController: UIViewController, AddItemDelegate {
+    
     func newTask(item: ToDoItem) {
-        if(checkNewItem) {
+        if checkNewItem {
             file.add(todoItem: item)
             file.saveToJSONFile()
+            addToDoNetwork(item: item)
             checkStatus()
         } else {
             file.update(id: updateItemID, text: item.text, importance: item.importance, deadline: item.deadline)
             file.saveToJSONFile()
+            changeToDoNetwork(item: item)
             checkStatus()
         }
     }
-    
 
     func didDelete(_: AddTodoController, item: ToDoItem) {
         file.remove(id: item.id)
         file.saveToJSONFile()
+        deleteToDoNetwork(id: item.id)
         checkStatus()
     }
     
-    
-    
     var updateItemID: String = ""
     var checkNewItem = false
+    let network: NetworkingService = DefaultNetworkingService()
     private lazy var tableView = makeTableView()
     private lazy var completed = makeCompleted()
     private lazy var show = makeShow()
-    var data: [ToDoItem] = [] {
+    var data: [ToDoItem] = []
+    var displayedData: [ToDoItem] = [] {
         didSet {
             tableView.reloadData()
         }
     }
+    var isDirty = true
     var completedTasks: Int = 0
     var file = FileCache(filepath: "/Users/new/Desktop/ToDo/ToDo/sss.json")
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        file.loadFromJSONFile()
-        data = file.todoItems.filter { $0.isDone == false }
+        loadTodoList()
         setupUI()
     }
     
-    func newTask(todoText: String, priority: Importance, deadline: Date?) {
-        
+    private func loadTodoList() {
+        Task(priority: .userInitiated) { [weak self] in
+            guard let self = self else { return }
+            do {
+                let todoList = try await self.network.getItemList()
+                self.data = todoList
+                print(todoList)
+            } catch {
+                self.isDirty = true
+            }
+        }
     }
     
+    func deleteToDoNetwork(id: String) {
+        
+        guard let itemIndex = data.firstIndex(where: { $0.id == id })
+        else { return }
+        data.remove(at: itemIndex)
+
+            if self.isDirty {
+                loadTodoList()
+            }
+
+            Task {
+                do {
+                    _ = try await network.deleteElement(by: id)
+                    self.isDirty = false
+                } catch {
+                    self.isDirty = true
+                }
+            }
+        }
+    
+    func addToDoNetwork(item: ToDoItem) {
+
+            if self.isDirty {
+                loadTodoList()
+            }
+
+            Task {
+                do {
+                    _ = try await network.postElement(with: item)
+                    self.isDirty = false
+                } catch {
+                    self.isDirty = true
+                }
+            }
+        }
+
+        func changeToDoNetwork(item: ToDoItem) {
+
+            if self.isDirty {
+                loadTodoList()
+            }
+
+            Task {
+                do {
+                    _ = try await network.putElement(by: item.id)
+                    self.isDirty = false
+                } catch {
+                    self.isDirty = true
+                }
+            }
+        }
+    
     private func updateCompletedCount() {
-        let completedCount = file.todoItems.filter { $0.isDone == true }.count
+        let completedCount = data.filter { $0.isDone == true }.count
         completedTasks = completedCount
         completed.text = "Выполнено — \(completedTasks)"
     }
     
     private func showNotCompletedTasks() {
-        data = data.filter { $0.isDone == false }
+        displayedData = data.filter { $0.isDone == false }
     }
     
     private func showAllTasks() {
-        data = file.todoItems
+        displayedData = data
     }
     
     private func makeTableView() -> UITableView {
@@ -125,10 +189,10 @@ class ViewController: UIViewController, AddItemDelegate {
     }
     
     private func checkStatus() {
-        if(self.show.titleLabel?.text == "Показать") {
-            self.data = self.file.todoItems.filter { $0.isDone == false }
+        if self.show.titleLabel?.text == "Показать" {
+            self.displayedData = self.data.filter { $0.isDone == false }
         } else {
-            self.data = self.file.todoItems
+            self.displayedData = self.data
         }
     }
     
@@ -139,7 +203,6 @@ class ViewController: UIViewController, AddItemDelegate {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
         navigationController?.navigationBar.layoutMargins = UIEdgeInsets(top: 0, left: 34, bottom: 0, right: 0)
-
         
         let addTask = UIButton()
         addTask.setImage(UIImage(named: "plus"), for: .normal)
@@ -170,7 +233,7 @@ class ViewController: UIViewController, AddItemDelegate {
         contentView.snp.makeConstraints {
             $0.edges.equalTo(scrollView)
             $0.width.equalTo(scrollView)
-            $0.bottom.equalTo(view.snp.bottom)
+            $0.bottom.equalTo(addTask.snp.bottom).offset(16)
         }
         
         stackView.snp.makeConstraints {
@@ -183,7 +246,7 @@ class ViewController: UIViewController, AddItemDelegate {
             $0.top.equalTo(stackView.snp.bottom).offset(12)
             $0.left.equalTo(contentView.snp.left).offset(16)
             $0.right.equalTo(contentView.snp.right).inset(16)
-            $0.bottom.equalTo(contentView.snp.bottom)
+            $0.bottom.equalTo(addTask.snp.bottom).offset(16)
         }
         
         addTask.snp.makeConstraints {
@@ -208,10 +271,9 @@ class ViewController: UIViewController, AddItemDelegate {
         navigationController.delegate = self
         self.checkNewItem = true
 
-        present(UINavigationController(rootViewController:navigationController), animated: true)
+        present(UINavigationController(rootViewController: navigationController), animated: true)
         
     }
-    
     
 }
 
@@ -220,9 +282,9 @@ extension ViewController: ToDoCellDelegate {
         guard let indexPath = tableView.indexPath(for: cell) else {
             return
         }
-        let id = data[indexPath.row].id
+        let id = displayedData[indexPath.row].id
 
-        if( data[indexPath.row].isDone ) {
+        if  displayedData[indexPath.row].isDone {
             file.notCompleteTask(id: id)
         } else {
             file.completedTask(id: id)
@@ -232,12 +294,9 @@ extension ViewController: ToDoCellDelegate {
     }
 }
 
-
-
-
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let num = data.count
+        let num = displayedData.count
         updateCompletedCount()
         return num
     }
@@ -252,7 +311,7 @@ extension ViewController: UITableViewDataSource {
         }
         cell.selectionStyle = .none
         cell.delegate = self
-        cell.configure(with: data[indexPath.row])
+        cell.configure(with: displayedData[indexPath.row])
         cell.backgroundColor = Colors.backElevated.color
         return cell
     }
@@ -261,24 +320,24 @@ extension ViewController: UITableViewDataSource {
 extension ViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let data  = self.data[indexPath.row]
-        let page = AddTodoController(item: data)
-        self.updateItemID = data.id
+        let displayedData  = self.displayedData[indexPath.row]
+        let page = AddTodoController(item: displayedData)
+        self.updateItemID = displayedData.id
         self.checkNewItem = false
-        page.updateItem(text: data.text, importance: data.importance, deadline: data.deadline)
+        page.updateItem(text: displayedData.text, importance: displayedData.importance, deadline: displayedData.deadline)
         page.delegate = self
-        self.present(UINavigationController(rootViewController:page), animated: true)
+        self.present(UINavigationController(rootViewController: page), animated: true)
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let actionInfo = UIContextualAction(style: .normal, title: "") { (action, view, completionHandler) in
-            let data  = self.data[indexPath.row]
-            let page = AddTodoController(item: data)
-            self.updateItemID = data.id
+        let actionInfo = UIContextualAction(style: .normal, title: "") { (_, _, completionHandler) in
+            let displayedData  = self.displayedData[indexPath.row]
+            let page = AddTodoController(item: displayedData)
+            self.updateItemID = displayedData.id
             self.checkNewItem = false
-            page.updateItem(text: data.text, importance: data.importance, deadline: data.deadline)
+            page.updateItem(text: displayedData.text, importance: displayedData.importance, deadline: displayedData.deadline)
             page.delegate = self
-            self.present(UINavigationController(rootViewController:page), animated: true)
+            self.present(UINavigationController(rootViewController: page), animated: true)
 
             completionHandler(true)
         }
@@ -286,7 +345,7 @@ extension ViewController: UITableViewDelegate {
         actionInfo.backgroundColor = Colors.colorGray2.color
         
         let actionRemove = UIContextualAction(style: .destructive, title: "") { (_, _, completionHandler) in
-            let id = self.data[indexPath.row].id
+            let id = self.displayedData[indexPath.row].id
             self.file.remove(id: id)
             self.file.saveToJSONFile()
             self.checkStatus()
@@ -299,8 +358,8 @@ extension ViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let actionDone = UIContextualAction(style: .normal, title: "") { (action, view, completionHandler) in
-            let id = self.data[indexPath.row].id
+        let actionDone = UIContextualAction(style: .normal, title: "") { (_, _, completionHandler) in
+            let id = self.displayedData[indexPath.row].id
             self.file.completedTask(id: id)
             self.file.saveToJSONFile()
             self.checkStatus()

@@ -28,7 +28,6 @@ class AddTodoView: UIView {
     weak var delegate: AddTodoViewDelegate?
     private let item: ToDoItem?
     
-    
     // MARK: - UI Elements
     
     private lazy var containerView = makeContainerView()
@@ -178,5 +177,3 @@ extension AddTodoView: DeadlineCalendarViewDelegate {
         deadlinePicker.setDate(Constants.nextDay, animated: true)
     }
 }
-
-

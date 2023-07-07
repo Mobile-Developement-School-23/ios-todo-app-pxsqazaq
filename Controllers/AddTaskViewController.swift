@@ -21,9 +21,6 @@ class AddTodoController: UIViewController {
         static let titleText = "Дело"
         static let saveTitle = "Сохранить"
         static let deleteTitle = "Удалить"
-        static let alertTitle = "Успех"
-        static let alertMessage = "Новое дело успешно сохранено"
-        static let alertActionTitle = "Ок"
         static let contentSpacing: CGFloat = 16
         static let scrollViewInsets = UIEdgeInsets(top: 16, left: 16, bottom: 0, right: -16)
         static let topBarHeight: CGFloat = 50
@@ -104,7 +101,7 @@ class AddTodoController: UIViewController {
             return
         }
         
-        if(textView.text == "Что надо сделать?") {
+        if textView.text == "Что надо сделать?" {
             navigationItem.rightBarButtonItem?.isEnabled = false
         }
         
@@ -131,7 +128,7 @@ class AddTodoController: UIViewController {
         view.keyboardLayoutGuide.followsUndockedKeyboard = true
         
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,constant: 16),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -225,8 +222,6 @@ class AddTodoController: UIViewController {
         navigationController?.popToRootViewController(animated: true)
     }
     
-    
-    
     @objc private func deleteButtonTapped() {
         delegate?.didDelete(self, item: item)
         dismiss(animated: true)
@@ -257,9 +252,9 @@ extension AddTodoController: CustomTextViewDelegate {
     
     func didChangeText(_ text: String) {
         presentationModel.text = text
-        if(!text.isEmpty){
+        if !text.isEmpty {
             navigationItem.rightBarButtonItem?.isEnabled = true
-        }else{
+        } else {
             navigationItem.rightBarButtonItem?.isEnabled = false
         }
         updateRightBarButtonItem()
@@ -277,4 +272,3 @@ extension AddTodoController: AddTodoViewDelegate {
         presentationModel.dueDate = deadline
     }
 }
-

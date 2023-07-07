@@ -152,4 +152,3 @@ final class PriorityView: UIView {
         setPriority(importance)
     }
 }
-

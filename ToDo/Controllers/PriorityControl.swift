@@ -100,7 +100,7 @@ final class PriorityControl: UIControl {
             let label = UILabel()
             label.font = DSFont.subhead.font
             label.textColor = DSColor.labelPrimary.color
-            label.text = "нет" // TODO: - Localize
+            label.text = "нет"
             label.translatesAutoresizingMaskIntoConstraints = false
             return label
         case .high:

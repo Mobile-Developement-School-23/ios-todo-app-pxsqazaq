@@ -81,7 +81,6 @@ final class FileCacheTests: XCTestCase {
         fileCache.add(todoItem: item2)
         fileCache.saveToCSVFile()
         
-        
         XCTAssertEqual(fileCache.todoItems.count, 2)
         XCTAssertTrue(fileCache.todoItems.contains(where: { $0.id == item1.id }))
         XCTAssertTrue(fileCache.todoItems.contains(where: { $0.id == item2.id }))

@@ -18,7 +18,7 @@ enum DSFont {
 
 extension DSFont {
     var font: UIFont {
-        var font: UIFont? = nil
+        var font: UIFont?
 
         switch self {
         case .largeTitle:
