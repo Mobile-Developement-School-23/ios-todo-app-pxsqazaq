@@ -12,7 +12,6 @@ protocol ToDoCellDelegate: AnyObject {
     func radioButtonTapped(cell: ToDoCell)
 }
 
-
 class ToDoCell: UITableViewCell {
 
     weak var delegate: ToDoCellDelegate?
@@ -20,7 +19,7 @@ class ToDoCell: UITableViewCell {
     private var isDone: Bool = false
     private var importance: String = ""
     
-    private var toDoText : UILabel = {
+    private var toDoText: UILabel = {
         let text = UILabel()
         text.numberOfLines = 3
         text.textColor = Colors.labelPrimary.color
@@ -29,27 +28,27 @@ class ToDoCell: UITableViewCell {
         return text
     }()
     
-    private var deadline : UILabel = {
+    private var deadline: UILabel = {
         let deadline = UILabel()
         deadline.textColor = Colors.labelTertiary.color
         deadline.font = GlobalConstants.subhead
         return deadline
     }()
     
-    private let calendarIcon : UIImageView = {
+    private let calendarIcon: UIImageView = {
         let image = UIImageView()
         image.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         image.image = UIImage(named: "Calendar")
         return image
     }()
     
-    private let chevronIcon : UIImageView = {
+    private let chevronIcon: UIImageView = {
         let image = UIImageView()
         image.image = UIImage(named: "present")
         return image
     }()
     
-    private let priorityIcon : UIImageView = {
+    private let priorityIcon: UIImageView = {
         let image = UIImageView()
         image.contentMode = .scaleAspectFit
         image.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -64,14 +63,14 @@ class ToDoCell: UITableViewCell {
         return button
     }()
 
-    lazy var stackViewItem : UIStackView = {
+    lazy var stackViewItem: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [priorityIcon, toDoText])
         stack.spacing = 5
         stack.axis = .horizontal
         return stack
     }()
     
-    lazy var stackViewDeadline : UIStackView = {
+    lazy var stackViewDeadline: UIStackView = {
         let stackViewDeadline = UIStackView(arrangedSubviews: [calendarIcon, deadline])
         stackViewDeadline.axis = .horizontal
         stackViewDeadline.spacing = 4
@@ -155,20 +154,18 @@ class ToDoCell: UITableViewCell {
         self.toDoText.text = viewModel.text
         self.isDone = viewModel.isDone
         self.importance = viewModel.importance.rawValue
-        if(viewModel.deadline != nil){
+        if viewModel.deadline != nil {
             withDeadline(deadline: viewModel.deadline!)
-        }
-        else{
+        } else {
             withoutDeadline()
         }
         if self.isDone {
             donetext(label: self.toDoText)
-        } else if self.importance == "важная" {
+        } else if self.importance == "important" {
             prioritytext(label: self.toDoText)
-        } else if self.importance == "неважная"{
+        } else if self.importance == "low"{
             lowtext(label: self.toDoText)
-        }
-        else {
+        } else {
             radioButton.setImage(UIImage(named: "Ellipse 1"), for: .normal)
             self.priorityIcon.isHidden = true
         }
@@ -177,7 +174,6 @@ class ToDoCell: UITableViewCell {
     @objc private func radioButtonTapped() {
         delegate?.radioButtonTapped(cell: self)
     }
-
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -189,4 +185,3 @@ class ToDoCell: UITableViewCell {
     }
     
 }
-

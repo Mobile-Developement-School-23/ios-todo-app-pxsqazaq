@@ -52,7 +52,7 @@ final class DeleteControl: UIControl {
     private func makeTitleLabel() -> UILabel {
         let label = UILabel()
         label.font = DSFont.body.font
-        label.text = "Удалить" // TODO: Localize
+        label.text = "Удалить"
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

@@ -7,19 +7,18 @@
 
 import Foundation
 
-
 // MARK: - Struct of ToDoItem
 
 struct ToDoItem {
-    let id : String
-    let text : String
-    let importance : Importance
-    let deadline : Date?
-    var isDone : Bool
-    let createdDate : Date
-    let dateOfChange : Date?
+    let id: String
+    let text: String
+    let importance: Importance
+    let deadline: Date?
+    var isDone: Bool
+    let createdDate: Date
+    let dateOfChange: Date?
     
-    enum Importance : String, CaseIterable {
+    enum Importance: String, CaseIterable {
         case low = "неважная"
         case normal = "обычная"
         case high = "важная"
@@ -52,7 +51,7 @@ extension ToDoItem {
         }
         
         let importanceRowValue = dict["importance"] as? String ?? ""
-        let importance = Importance(rawValue : importanceRowValue) ?? .normal
+        let importance = Importance(rawValue: importanceRowValue) ?? .normal
         
         var deadline: Date?
         if let deadlineTimestamp = dict["deadline"] as? Double {
@@ -104,7 +103,7 @@ extension ToDoItem {
         return Date(timeIntervalSince1970: timestamp)
     }
     
-    static func parse(csv : String) -> [ToDoItem] {
+    static func parse(csv: String) -> [ToDoItem] {
         var items: [ToDoItem] = []
         
         var rows = csv.components(separatedBy: "\n")
@@ -120,10 +119,9 @@ extension ToDoItem {
                 let isDoneString = components[4].trimmingCharacters(in: .whitespaces)
                 let creationDateString = components[5].trimmingCharacters(in: .whitespaces)
                 let dateOfChangeString = components[6].trimmingCharacters(in: .whitespaces)
-
                 
                 if let isDone = Bool(isDoneString),
-                   let createdDate = stringToDate(from: creationDateString){
+                   let createdDate = stringToDate(from: creationDateString) {
                     let dateOfChange = stringToDate(from: dateOfChangeString)
                     let importance = Importance(rawValue: importanceString)
                     let deadline = stringToDate(from: deadlineString)
@@ -152,7 +150,7 @@ extension ToDoItem {
         
         if importance == "обычная" {
             csv += ","
-        }else{
+        } else {
             csv += "\(importance),"
         }
         
@@ -166,7 +164,7 @@ extension ToDoItem {
         
         if let dateOfChange = dateOfChange {
             csv += ",\(dateOfChange.timeIntervalSince1970)\n"
-        }else{
+        } else {
             csv += ",\n"
         }
         

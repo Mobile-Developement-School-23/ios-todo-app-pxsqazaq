@@ -79,7 +79,7 @@ final class PriorityPickerView: UIView {
     private func makeTitleLabel() -> UILabel {
         let label = UILabel()
         label.font = DSFont.body.font
-        label.text = "Важность" // TODO: - Localize
+        label.text = "Важность" 
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }

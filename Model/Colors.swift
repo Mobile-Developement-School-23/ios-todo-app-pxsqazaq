@@ -31,7 +31,7 @@ enum Colors {
 
 extension Colors {
     var color: UIColor {
-        var color: UIColor? = nil
+        var color: UIColor?
         
         switch self {
         case .backView:

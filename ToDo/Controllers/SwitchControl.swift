@@ -105,7 +105,7 @@ final class SwitchControl: UIControl {
         NSLayoutConstraint.activate(
             [
                 stackView.centerYAnchor.constraint(equalTo: centerYAnchor),
-                stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+                stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16)
             ]
         )
         NSLayoutConstraint.activate(

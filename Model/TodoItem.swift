@@ -7,19 +7,16 @@
 
 import Foundation
 
-
 // MARK: - Struct of ToDoItem
 
 struct ToDoItem {
-    let id : String
-    var text : String
-    var importance : Importance
-    var deadline : Date?
-    var isDone : Bool
-    let createdDate : Date
-    let dateOfChange : Date?
-    
-    
+    let id: String
+    var text: String
+    var importance: Importance
+    var deadline: Date?
+    var isDone: Bool
+    let createdDate: Date
+    let dateOfChange: Date?
     
     init(id: String = UUID().uuidString, text: String, importance: Importance = .normal, deadline: Date? = nil, isDone: Bool = false, createdDate: Date = Date(), dateOfChange: Date? = nil) {
         self.id = id
@@ -33,10 +30,10 @@ struct ToDoItem {
     }
 }
 
-enum Importance : String {
-    case low = "неважная"
-    case normal = "обычная"
-    case high = "важная"
+enum Importance: String {
+    case low
+    case normal = "basic"
+    case high = "important"
 }
 
 // MARK: - JSON Parsing
@@ -47,14 +44,14 @@ extension ToDoItem {
         guard let dict = json as? [String: Any],
               let id = dict["id"] as? String,
               let text = dict["text"] as? String,
-              let isDone = dict["isDone"] as? Bool,
-              let createdTimestamp = dict["createdDate"] as? Double
+              let isDone = dict["done"] as? Bool,
+              let createdTimestamp = dict["created_at"] as? Double
         else {
             return nil
         }
         
         let importanceRowValue = dict["importance"] as? String ?? ""
-        let importance = Importance(rawValue : importanceRowValue) ?? .normal
+        let importance = Importance(rawValue: importanceRowValue) ?? .normal
         
         var deadline: Date?
         if let deadlineTimestamp = dict["deadline"] as? Double {
@@ -64,7 +61,7 @@ extension ToDoItem {
         let createdDate = Date(timeIntervalSince1970: createdTimestamp)
         
         var dateOfChange: Date?
-        if let dateOfChangeTimestamp = dict["dateOfChange"] as? Double {
+        if let dateOfChangeTimestamp = dict["changed_at"] as? Double {
             dateOfChange = Date(timeIntervalSince1970: dateOfChangeTimestamp)
         }
         
@@ -76,22 +73,22 @@ extension ToDoItem {
         var dict: [String: Any] = [
             "id": id,
             "text": text,
-            "isDone": isDone,
-            "createdDate": createdDate.timeIntervalSince1970
+            "done": isDone,
+            "created_at": Int(createdDate.timeIntervalSince1970)
         ]
         
         if let deadline = deadline {
-            dict["deadline"] = deadline.timeIntervalSince1970
+            dict["deadline"] = Int(deadline.timeIntervalSince1970)
         }
         
-        if let dateOfChange = dateOfChange {
-            dict["dateOfChange"] = dateOfChange.timeIntervalSince1970
-        }
+//        if let dateOfChange = dateOfChange {
+            dict["changed_at"] = Int(Date().timeIntervalSince1970)
+//        }
         
-        if importance != .normal {
+//        if importance != .normal {
             dict["importance"] = importance.rawValue
-        }
-        
+//        }
+        dict["last_updated_by"] = "test"
         return dict
     }
     
@@ -106,7 +103,7 @@ extension ToDoItem {
         return Date(timeIntervalSince1970: timestamp)
     }
     
-    static func parse(csv : String) -> [ToDoItem] {
+    static func parse(csv: String) -> [ToDoItem] {
         var items: [ToDoItem] = []
         
         var rows = csv.components(separatedBy: "\n")
@@ -122,10 +119,9 @@ extension ToDoItem {
                 let isDoneString = components[4].trimmingCharacters(in: .whitespaces)
                 let creationDateString = components[5].trimmingCharacters(in: .whitespaces)
                 let dateOfChangeString = components[6].trimmingCharacters(in: .whitespaces)
-
                 
                 if let isDone = Bool(isDoneString),
-                   let createdDate = stringToDate(from: creationDateString){
+                   let createdDate = stringToDate(from: creationDateString) {
                     let importance = Importance(rawValue: importanceString)
                     let deadline = stringToDate(from: deadlineString)
                     let item = ToDoItem(
@@ -153,7 +149,7 @@ extension ToDoItem {
         
         if importance == "обычная" {
             csv += ","
-        }else{
+        } else {
             csv += "\(importance),"
         }
         
@@ -167,10 +163,33 @@ extension ToDoItem {
         
         if let dateOfChange = dateOfChange {
             csv += ",\(dateOfChange.timeIntervalSince1970)\n"
-        }else{
+        } else {
             csv += ",\n"
         }
         
         return csv
     }
 }
+
+//extension ToDoItem {
+//    static func convertFromDTO(dto: ToDoItemDTO) -> ToDoItem {
+//        if let deadline = dto.deadline {
+//            return ToDoItem(id: dto.id ?? UUID().uuidString,
+//                            text: dto.text,
+//                            importance: Importance(rawValue: dto.importance) ?? .normal,
+//                            deadline: Date(timeIntervalSince1970: TimeInterval(deadline)),
+//                            isDone: dto.isDone,
+//                            createdDate: Date(timeIntervalSince1970: TimeInterval(dto.createdAt)),
+//                            dateOfChange: Date(timeIntervalSince1970: TimeInterval(dto.changedAt))
+//            )
+//        }
+//        return ToDoItem(id: dto.id ?? UUID().uuidString,
+//                        text: dto.text,
+//                        importance: Importance(rawValue: dto.importance) ?? .normal,
+//                        deadline: nil,
+//                        isDone: dto.isDone,
+//                        createdDate: Date(timeIntervalSince1970: TimeInterval(dto.createdAt)),
+//                        dateOfChange: Date(timeIntervalSince1970: TimeInterval(dto.changedAt))
+//            )
+//    }
+//}

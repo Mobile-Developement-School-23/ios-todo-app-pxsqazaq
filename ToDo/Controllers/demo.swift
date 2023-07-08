@@ -12,9 +12,9 @@ import UIKit
 
 final class TodoItemDetailsViewController: UIViewController {
     private lazy var navBarContainerView = makeNavBarContainerView()
-    private lazy var leftBarButton = makeBarButton(with: "Отменить") // TODO: - Localize
+    private lazy var leftBarButton = makeBarButton(with: "Отменить")
     private lazy var titleLabel = makeTitleLabel()
-    private lazy var rightBarButton = makeBarButton(with: "Сохранить") // TODO: - Localize
+    private lazy var rightBarButton = makeBarButton(with: "Сохранить")
     private lazy var scrollView = makeScrollView()
     private lazy var stackView = makeStackView()
     private lazy var textView = makeTextView()
@@ -194,7 +194,7 @@ final class TodoItemDetailsViewController: UIViewController {
         let label = UILabel()
         label.font = DSFont.body.font
         label.textAlignment = .center
-        label.text = "Дело" // TODO: - Localize
+        label.text = "Дело"
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }
@@ -255,7 +255,6 @@ extension TodoItemDetailsViewController: UITextViewDelegate {
         newText = textView.text
     }
 }
-
 
 // MARK: - TodoItemDetailsViewDelegate
 

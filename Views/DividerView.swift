@@ -20,4 +20,3 @@ class DividerView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 }
-

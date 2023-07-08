@@ -5,10 +5,10 @@
 ////  Created by Arystan on 01.07.2023.
 ////
 //
-//import Foundation
-//import UIKit
+// import Foundation
+// import UIKit
 //
-//class TableViewHeaderCell: UITableViewHeaderFooterView {
+// class TableViewHeaderCell: UITableViewHeaderFooterView {
 //
 //    var valueDidChange: (() -> Void)?
 //
@@ -66,9 +66,9 @@
 //            buttonView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
 //        ])
 //    }
-//}
+// }
 //
-//extension TableViewHeaderCell {
+// extension TableViewHeaderCell {
 //
 //    @objc func pressedButtonHeader(_ button: UIButton) {
 //        if button.isSelected {
@@ -82,5 +82,5 @@
 //            self.valueDidChange?()
 //        }
 //    }
-//}
+// }
 //

@@ -36,6 +36,10 @@
 		D5CFBE362A36CB02004AE4C6 /* ToDoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5CFBE352A36CB02004AE4C6 /* ToDoTests.swift */; };
 		D5CFBE402A36CB02004AE4C6 /* ToDoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5CFBE3F2A36CB02004AE4C6 /* ToDoUITests.swift */; };
 		D5CFBE422A36CB02004AE4C6 /* ToDoUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5CFBE412A36CB02004AE4C6 /* ToDoUITestsLaunchTests.swift */; };
+		D5FD86792A569A2100FC43D1 /* CocoaLumberjack in Frameworks */ = {isa = PBXBuildFile; productRef = D5FD86782A569A2100FC43D1 /* CocoaLumberjack */; };
+		D5FD867B2A569A2700FC43D1 /* CocoaLumberjackSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D5FD867A2A569A2700FC43D1 /* CocoaLumberjackSwift */; };
+		D5FD867E2A56F73400FC43D1 /* NetworkingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5FD867D2A56F73400FC43D1 /* NetworkingService.swift */; };
+		D5FD86802A58B0DD00FC43D1 /* ToDoItemDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5FD867F2A58B0DD00FC43D1 /* ToDoItemDTO.swift */; };
 		E0A4E765BB409D6F0DF8BF59 /* Pods_ToDo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49D80C8A6BC3A439554733D6 /* Pods_ToDo.framework */; };
 /* End PBXBuildFile section */
 
@@ -93,6 +97,8 @@
 		D5CFBE3B2A36CB02004AE4C6 /* ToDoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ToDoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5CFBE3F2A36CB02004AE4C6 /* ToDoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoUITests.swift; sourceTree = "<group>"; };
 		D5CFBE412A36CB02004AE4C6 /* ToDoUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		D5FD867D2A56F73400FC43D1 /* NetworkingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingService.swift; sourceTree = "<group>"; };
+		D5FD867F2A58B0DD00FC43D1 /* ToDoItemDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoItemDTO.swift; sourceTree = "<group>"; };
 		DF6C9C4640886EF713B762BA /* Pods-ToDoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ToDoTests.release.xcconfig"; path = "Target Support Files/Pods-ToDoTests/Pods-ToDoTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -112,7 +118,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5FD86792A569A2100FC43D1 /* CocoaLumberjack in Frameworks */,
 				19391CEEEC596B9184A5F8AB /* Pods_ToDoTests.framework in Frameworks */,
+				D5FD867B2A569A2700FC43D1 /* CocoaLumberjackSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -157,6 +165,7 @@
 			children = (
 				D5CE149B2A3C7CA70098F174 /* TodoItem.swift */,
 				D574BBEB2A4ADEA1000EF542 /* AddTodoPresentationModel.swift */,
+				D5FD867F2A58B0DD00FC43D1 /* ToDoItemDTO.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -183,6 +192,7 @@
 		D5CFBE122A36CAFF004AE4C6 = {
 			isa = PBXGroup;
 			children = (
+				D5FD867C2A56F71000FC43D1 /* Networking */,
 				D5AAF8742A45A8C400C40B67 /* Helpers */,
 				D5AAF8722A45A7D800C40B67 /* Controllers */,
 				D5AAF8702A45A7C300C40B67 /* Model */,
@@ -240,6 +250,14 @@
 			path = ToDoUITests;
 			sourceTree = "<group>";
 		};
+		D5FD867C2A56F71000FC43D1 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				D5FD867D2A56F73400FC43D1 /* NetworkingService.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
 		F28EF928B18131D4EC7B572C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -292,6 +310,10 @@
 				D5CFBE332A36CB02004AE4C6 /* PBXTargetDependency */,
 			);
 			name = ToDoTests;
+			packageProductDependencies = (
+				D5FD86782A569A2100FC43D1 /* CocoaLumberjack */,
+				D5FD867A2A569A2700FC43D1 /* CocoaLumberjackSwift */,
+			);
 			productName = ToDoTests;
 			productReference = D5CFBE312A36CB02004AE4C6 /* ToDoTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -431,7 +453,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		AB8613C443253B55658A53BB /* [CP] Check Pods Manifest.lock */ = {
@@ -483,6 +505,7 @@
 				D5CFBE232A36CAFF004AE4C6 /* ViewController.swift in Sources */,
 				D5AAF8762A45A91E00C40B67 /* TextView.swift in Sources */,
 				D574BBF02A4ADFA8000EF542 /* Extentions.swift in Sources */,
+				D5FD867E2A56F73400FC43D1 /* NetworkingService.swift in Sources */,
 				D574BBFB2A4F7B96000EF542 /* TableViewHeaderCell.swift in Sources */,
 				D574BBEA2A4ADDDC000EF542 /* AddToDoView.swift in Sources */,
 				D574BBEE2A4ADF88000EF542 /* Colors.swift in Sources */,
@@ -491,6 +514,7 @@
 				D5CFBE1F2A36CAFF004AE4C6 /* AppDelegate.swift in Sources */,
 				D5CE149C2A3C7CA70098F174 /* TodoItem.swift in Sources */,
 				D574BBEC2A4ADEA1000EF542 /* AddTodoPresentationModel.swift in Sources */,
+				D5FD86802A58B0DD00FC43D1 /* ToDoItemDTO.swift in Sources */,
 				D5CE149E2A3C7D180098F174 /* FileCache.swift in Sources */,
 				D5AAF87C2A45C1D200C40B67 /* DeadlineView.swift in Sources */,
 				D5CFBE212A36CAFF004AE4C6 /* SceneDelegate.swift in Sources */,
@@ -602,6 +626,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
 			};
 			name = Debug;
 		};
@@ -655,6 +680,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -682,6 +708,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = Arystan.ToDo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -710,6 +737,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = Arystan.ToDo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -866,6 +894,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D5A3F8F52A3EE0AD0032083B /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		D5FD86782A569A2100FC43D1 /* CocoaLumberjack */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D574BBFC2A4FB4BC000EF542 /* XCRemoteSwiftPackageReference "CocoaLumberjack" */;
+			productName = CocoaLumberjack;
+		};
+		D5FD867A2A569A2700FC43D1 /* CocoaLumberjackSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D574BBFC2A4FB4BC000EF542 /* XCRemoteSwiftPackageReference "CocoaLumberjack" */;
+			productName = CocoaLumberjackSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

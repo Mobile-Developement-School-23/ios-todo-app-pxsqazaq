@@ -97,7 +97,7 @@ final class TodoItemDetailsView: UIView {
             arrangedSubviews: [
                 priorityView,
                 deadlineControl,
-                calendarView,
+                calendarView
             ]
         )
         stackView.axis = .vertical
@@ -115,7 +115,7 @@ final class TodoItemDetailsView: UIView {
         let control = SwitchControl()
         control.addTarget(self, action: #selector(didTapDeadlineControl), for: .touchUpInside)
         control.isHiddenDividerByDefault = false
-        control.title = "Сделать до" // TODO: - Localize
+        control.title = "Сделать до"
         return control
     }
     
@@ -143,5 +143,3 @@ extension TodoItemDetailsView: CalendarViewDelegate {
         delegate?.didSelectDeadline(date)
     }
 }
-
-
