@@ -7,71 +7,137 @@
 
 import UIKit
 
-class DeadlineView: UIView {
+protocol DeadlineCalendarViewDelegate: AnyObject {
+    func deadlineSwitcherChanged(_ isOn: Bool)
+    func deadlineButtonTapped()
+}
+
+class DeadlineCalendarView: UIView {
     
-    private let titleLabel: UILabel = {
+    // MARK: Properties
+    
+    private enum LocalConstants {
+        static let deadlineText = "Сделать до"
+        static let stackViewInsets = UIEdgeInsets(top: 16, left: 16, bottom: -16, right: 0)
+        static let trailingInset: CGFloat = -16
+        static let dividerHeight: CGFloat = 0.5
+        static let dividerInsets: UIEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: -16)
+    }
+    
+    weak var delegate: DeadlineCalendarViewDelegate?
+    
+    // MARK: Lifecycle
+    
+    private lazy var dividerView = makeDividerView()
+    
+    private let stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
+    private let deadlineLabel: UILabel = {
         let label = UILabel()
-        label.text = "Сделать до"
-        label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
+        label.text = LocalConstants.deadlineText
+        label.font = GlobalConstants.body
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let calendar = CalendarView()
-    
-    private let hiddenDivider = DividerView()
-    
-    private let switchControl: UISwitch = {
-        let switchControl = UISwitch()
-        switchControl.addTarget(self, action: #selector(switchValueChanged(_:)), for: .valueChanged)
-        switchControl.translatesAutoresizingMaskIntoConstraints = false
-        return switchControl
+    private let deadlineSwitcher: UISwitch = {
+        let switcher = UISwitch()
+        switcher.addTarget(self, action: #selector(switcherChanged(_:)), for: .valueChanged)
+        switcher.translatesAutoresizingMaskIntoConstraints = false
+        return switcher
     }()
-        
+    
+    private let deadlineButton: UIButton = {
+        let button = UIButton()
+        button.setTitleColor(.systemBlue, for: .normal)
+        button.titleLabel?.font = GlobalConstants.footnote
+        button.isHidden = true
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(deadlineButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    // MARK: - Init
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        addSubviews()
-        addConstraints()
-    }
-    
-    private func addSubviews() {
-        addSubview(titleLabel)
-        addSubview(switchControl)
-        addSubview(hiddenDivider)
-    }
-    
-    private func addConstraints() {
-        NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 17),
-            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -17),
-            
-            switchControl.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            switchControl.centerYAnchor.constraint(equalTo: centerYAnchor),
-            
-            hiddenDivider.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            hiddenDivider.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            hiddenDivider.bottomAnchor.constraint(equalTo: bottomAnchor),
-            hiddenDivider.heightAnchor.constraint(equalToConstant: 0.5)
-        ])
+        
+        setupSubviews()
+        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc func switchValueChanged(_ sender: UISwitch) {
-        if sender.isOn {
-            hiddenDivider.isHidden = false
-            addSubview(calendar)
-            print("Switch is ON")
-        } else {
-            calendar.removeFromSuperview()
-            hiddenDivider.isHidden = true
-            print("Switch is OFF")
-        }
+    private func makeDividerView() -> DividerView {
+        let view = DividerView()
+        view.isHidden = true
+        return view
     }
     
+    private func setupSubviews() {
+        addSubview(deadlineSwitcher)
+        addSubview(stackView)
+        stackView.addArrangedSubview(deadlineLabel)
+        stackView.addArrangedSubview(deadlineButton)
+        addSubview(dividerView)
+    }
     
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: LocalConstants.stackViewInsets.left),
+            stackView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            
+            deadlineSwitcher.centerYAnchor.constraint(equalTo: centerYAnchor),
+            deadlineSwitcher.trailingAnchor.constraint(equalTo: trailingAnchor, constant: LocalConstants.trailingInset),
+            
+            dividerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: LocalConstants.dividerInsets.left),
+            dividerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: LocalConstants.dividerInsets.right),
+            dividerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            dividerView.heightAnchor.constraint(equalToConstant: LocalConstants.dividerHeight)
+        ])
+    }
     
+    // MARK: - Selectors
+    
+    @objc private func switcherChanged(_ switcher: UISwitch) {
+        delegate?.deadlineSwitcherChanged(switcher.isOn)
+    }
+    
+    @objc private func deadlineButtonTapped() {
+
+        delegate?.deadlineButtonTapped()
+        dividerView.isHidden.toggle()
+    }
+    
+    // MARK: - Public
+    
+    func setDeadlineButtonTitle(_ title: Date) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMMM yyyy"
+        let dateString = formatter.string(from: title)
+        deadlineButton.setTitle(dateString, for: .normal)
+    }
+    
+    func updateLayoutSwitch(for date: Date?) {
+        guard let date = date else {
+            deadlineSwitcher.isOn = false
+            deadlineButton.isHidden = true
+            return
+        }
+        
+        deadlineSwitcher.isOn = true
+        deadlineButton.isHidden = false
+        setDeadlineButtonTitle(date)
+    }
+    
+    func update(date: Date?) {
+        updateLayoutSwitch(for: date)
+    }
 }
