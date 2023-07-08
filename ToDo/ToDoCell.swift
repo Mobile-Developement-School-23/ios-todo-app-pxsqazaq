@@ -161,9 +161,9 @@ class ToDoCell: UITableViewCell {
         }
         if self.isDone {
             donetext(label: self.toDoText)
-        } else if self.importance == "важная" {
+        } else if self.importance == "important" {
             prioritytext(label: self.toDoText)
-        } else if self.importance == "неважная"{
+        } else if self.importance == "low"{
             lowtext(label: self.toDoText)
         } else {
             radioButton.setImage(UIImage(named: "Ellipse 1"), for: .normal)

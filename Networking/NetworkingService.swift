@@ -11,185 +11,244 @@ import CocoaLumberjackSwift
 
 protocol NetworkingService {
     func getItemList() async throws -> [ToDoItem]
-    func getItem(by id: String) async throws -> ToDoItem
+    func getItem(by id: String) async throws -> ToDoItem?
     func patchItemList(with toDoItems: [ToDoItem]) async throws -> [ToDoItem]
-    func putElement(by id: String) async throws -> ToDoItem
-    func postElement(with todoItemClient: ToDoItem) async throws -> ToDoItem
-    func deleteElement(by id: String) async throws -> ToDoItem
+    func putElement(by item: ToDoItem) async throws -> ToDoItem?
+    func postElement(with todoItemClient: ToDoItem) async throws -> ToDoItem?
+    func deleteElement(by id: String) async throws -> ToDoItem?
 }
 
-class DefaultNetworkingService: NetworkingService {
+final class DefaultNetworkingService: NetworkingService {
     
-    private let token = "pother"
-    private let username = "Moldabek_A"
-    private var revision = 6
-    private let baseURL = "https://beta.mrdekk.ru/todobackend"
-    private let endpoint = "/list"
+    private struct Configuration {
+        static let scheme = "https"
+        static let host = "beta.mrdekk.ru"
+        static let path = "todobackend"
+        static let token = "pother"
+    }
+    
+    private(set) var numberOfTasks = 0
+    private let urlSession: URLSession
+    private var revision: Int = 0
+    private let deviceID: String
+    
+    init(urlSession: URLSession = URLSession.shared, deviceID: String) {
+        self.urlSession = urlSession
+        self.deviceID = deviceID
+    }
+    
+    // MARK: - Public Methods
+    
+    @MainActor
+    func incrementNumberOfTasks() {
+        numberOfTasks += 1
+    }
+    
+    @MainActor
+    func decrementNumberOfTasks() {
+        numberOfTasks -= 1
+    }
     
     func getItemList() async throws -> [ToDoItem] {
-        guard let url = createURL() else {
-            throw NetworkingError.badURL
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("Bearer pother", forHTTPHeaderField: "Autorization")
-//        request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
-        let (data, response) = try await URLSession.shared.dataTask(for: request)
-        //        print("after")
-        print(data)
-        print(response)
-        let list = try JSONDecoder().decode(ToDoListDTO.self, from: data)
-        if let revision = list.revision {
+        let request = try makeGetRequest(path: "/\(Configuration.path)/list")
+        let (data, _) = try await performRequest(request)
+        let response = try JSONDecoder().decode(TodoListDTO.self, from: data)
+        if let revision = response.revision {
             self.revision = revision
         }
-        let todoItems = list.list.compactMap(mapData(element:))
-        print(todoItems)
-        DDLogInfo("GET list of ToDoItems from the server")
-        print(todoItems)
-        return todoItems
+        return response.list.compactMap(mapData(element:))
     }
     
-    func getItem(by id: String) async throws -> ToDoItem {
-        guard let url = createURL(id: id) else {
-            throw NetworkingError.badURL
+    func patchItemList(with todoList: [ToDoItem]) async throws -> [ToDoItem] {
+        let todoListDTO = TodoListDTO(list: todoList.map { mapData(todoItem: $0) })
+        let requestBody = try JSONEncoder().encode(todoListDTO)
+        let request = try makePatchRequest(path: "/\(Configuration.path)/list", body: requestBody)
+        let (data, _) = try await performRequest(request)
+        let response = try JSONDecoder().decode(TodoListDTO.self, from: data)
+        if let revision = response.revision {
+            self.revision = revision
         }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.addValue("Bearer pother", forHTTPHeaderField: "Autorization")
-        let (data, _) = try await URLSession.shared.dataTask(for: request)
-        let todoItem = try parseTodoItem(data: data)
-        print(todoItem)
-        //        let response = try JSONDecoder().decode(TodoListDTO.self, from: data)
-        //        if let revision = response.revision {
-        //            self.revision = revision
-        //        }
-        DDLogInfo("GET element from the server")
-        return todoItem
+        return response.list.compactMap(mapData(element:))
     }
     
-    func putElement(by id: String) async throws -> ToDoItem {
-        guard let url = createURL(id: id) else {
-            throw NetworkingError.badURL
+    func getItem(by id: String) async throws -> ToDoItem? {
+        let request = try makeGetRequest(path: "/\(Configuration.path)/list/\(id)")
+        let (data, _) = try await performRequest(request)
+        let response = try JSONDecoder().decode(TodoItemDTO.self, from: data)
+        if let revision = response.revision {
+            self.revision = revision
         }
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.addValue("Bearer " + token, forHTTPHeaderField: "Authorization")
+        return mapData(element: response.element)
+    }
+    
+    @discardableResult
+    func postElement(with todoItem: ToDoItem) async throws -> ToDoItem? {
+        let todoItemDTO = TodoItemDTO(element: mapData(todoItem: todoItem))
+        print(todoItemDTO)
+        let requestBody = try JSONEncoder().encode(todoItemDTO)
+        let request = try makePostRequest(path: "/\(Configuration.path)/list", body: requestBody)
+        let (data, _) = try await performRequest(request)
+        let response = try JSONDecoder().decode(TodoItemDTO.self, from: data)
+        if let revision = response.revision {
+            self.revision = revision
+        }
+        return mapData(element: response.element)
+    }
+    
+    @discardableResult
+    func putElement(by todoItem: ToDoItem) async throws -> ToDoItem? {
+        let todoItemDTO = TodoItemDTO(element: mapData(todoItem: todoItem))
+        print(todoItemDTO)
+        let requestBody = try JSONEncoder().encode(todoItemDTO)
+        let request = try makePutRequest(
+            path: "/\(Configuration.path)/list/\(todoItem.id)",
+            body: requestBody
+        )
+        let (data, _) = try await performRequest(request)
+        let response = try JSONDecoder().decode(TodoItemDTO.self, from: data)
+        if let revision = response.revision {
+            self.revision = revision
+        }
+        return mapData(element: response.element)
+    }
+    
+    @discardableResult
+    func deleteElement(by id: String) async throws -> ToDoItem? {
+        let request = try makeDeleteRequest(path: "/\(Configuration.path)/list/\(id)")
+        let (data, _) = try await performRequest(request)
+        let response = try JSONDecoder().decode(TodoItemDTO.self, from: data)
+        if let revision = response.revision {
+            self.revision = revision
+        }
         
-        let (data, _) = try await URLSession.shared.dataTask(for: request)
-        let toDoItem = try parseTodoItem(data: data)
-        DDLogInfo("PUT element inside the server")
-        return toDoItem
+        return mapData(element: response.element)
     }
     
-    func postElement(with todoItemClient: ToDoItem) async throws -> ToDoItem {
-        guard let url = createURL() else {
-            throw NetworkingError.badURL
-        }
-        let element = todoItemClient.json
-        //        print(element)
-        let body = try JSONSerialization.data(withJSONObject: ["element": element])
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.allHTTPHeaderFields = ["X-Last-Known-Revision": "\(self.revision)"]
-        self.revision += 1
-        request.addValue("Bearer pother", forHTTPHeaderField: "Authorization")
-        request.httpBody = body
-        print("before")
-        let (data, _) = try await URLSession.shared.dataTask(for: request)
-        print(data)
-        let toDoItem = try parseTodoItem(data: data)
-        print(toDoItem)
-        DDLogInfo("POST element to the server")
-        return toDoItem
-    }
+    // MARK: - Private Methods
     
-    func deleteElement(by id: String) async throws -> ToDoItem {
-        guard let url = createURL(id: id) else {
-            throw NetworkingError.badURL
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
-        request.addValue("Bearer " + token, forHTTPHeaderField: "Authorization")
-        request.allHTTPHeaderFields = ["X-Last-Known-Revision": "\(self.revision)"]
-        self.revision += 1
+    private func makeURL(path: String) throws -> URL {
+        var urlComponents = URLComponents()
+        urlComponents.scheme = Configuration.scheme
+        urlComponents.host = Configuration.host
+        urlComponents.path = path
         
-        let (data, _) = try await URLSession.shared.dataTask(for: request)
-        let toDoItem = try parseTodoItem(data: data)
-        DDLogInfo("DELETE element from server")
-        return toDoItem
-    }
-    
-    func patchItemList(with toDoItems: [ToDoItem]) async throws -> [ToDoItem] {
-        guard let url = createURL() else {
-            throw NetworkingError.badURL
+        guard let url = urlComponents.url else {
+            throw RequestError.wrongURL(urlComponents)
         }
-        let list = toDoItems.map({ $0.json })
-        let body = try JSONSerialization.data(withJSONObject: ["list": list])
-        var request = URLRequest(url: url)
-        request.httpMethod = "PATCH"
-        request.addValue("Bearer " + token, forHTTPHeaderField: "Authorization")
-        request.allHTTPHeaderFields = ["X-Last-Known-Revision": "\(self.revision)"]
-        request.httpBody = body
-        let (data, _) =  try await URLSession.shared.dataTask(for: request)
-        let toDoItems = try parseTodoItems(data: data)
-        DDLogInfo("PATCH list of ToDoItems in the server")
-        return toDoItems
-    }
-    
-    private func createURL(id: String = "") -> URL? {
-        let addressURL = baseURL + endpoint + id
-        let url = URL(string: addressURL)
         return url
     }
     
-    private func parseTodoItems(data: Data) throws -> [ToDoItem] {
-        guard
-            let jsonArray = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-            let revision = jsonArray["revision"] as? Int,
-            let list = jsonArray["list"] as? [[String: Any]]
-        else { throw NetworkingError.impossinbleToDecode }
-        var todoItemsOrigin: [ToDoItem] = []
-        for item in list {
-            guard let todoItem = ToDoItem.parse(json: item)
-            else { throw NetworkingError.impossinbleToDecode }
-            todoItemsOrigin.append(todoItem)
+    private func makeGetRequest(path: String) throws -> URLRequest {
+        let url = try makeURL(path: path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
+        return request
+    }
+    
+    private func makePatchRequest(path: String, body: Data) throws -> URLRequest {
+        let url = try makeURL(path: path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
+        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
+        request.httpBody = body
+        return request
+    }
+    
+    private func makePostRequest(path: String, body: Data) throws -> URLRequest {
+        let url = try makeURL(path: path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
+        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
+        request.httpBody = body
+        return request
+    }
+    
+    private func makePutRequest(path: String, body: Data) throws -> URLRequest {
+        let url = try makeURL(path: path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
+        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
+        request.httpBody = body
+        return request
+    }
+    
+    private func makeDeleteRequest(path: String) throws -> URLRequest {
+        let url = try makeURL(path: path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
+        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
+        return request
+    }
+    
+    private func performRequest(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+        let (data, response) = try await urlSession.data(for: request)
+        guard let response = response as? HTTPURLResponse else {
+            throw RequestError.unexpectedResponse
         }
-        self.revision = revision
-        DDLogInfo("revision = \(self.revision)")
-        return todoItemsOrigin
+        try handleStatusCode(response: response)
+        return (data, response)
     }
     
-    private func parseTodoItem(data: Data) throws -> ToDoItem {
-        guard
-            let jsonArray = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-            let revision = jsonArray["revision"] as? Int,
-            let element = jsonArray["element"] as? [String: Any],
-            let todoItem = ToDoItem.parse(json: element)
-        else { throw URLError(.cannotDecodeContentData) }
-        self.revision = revision
-        DDLogInfo("revision = \(self.revision)")
-        return todoItem
+    private func handleStatusCode(response: HTTPURLResponse) throws {
+        switch response.statusCode {
+        case 100 ... 299:
+            return
+        case 400:
+            throw RequestError.badRequest
+        case 401:
+            throw RequestError.wrongAuth
+        case 404:
+            throw RequestError.notFound
+        case 500 ... 599:
+            throw RequestError.serverError
+        default:
+            throw RequestError.unexpectedStatusCode(response.statusCode)
+        }
     }
     
+    private func mapData(todoItem: ToDoItem) -> ElementDTO {
+        return ElementDTO(
+            id: todoItem.id,
+            text: todoItem.text,
+            importance: todoItem.importance.rawValue,
+            deadline: todoItem.deadline.map { Int($0.timeIntervalSince1970) },
+            done: todoItem.isDone,
+            color: "fffff",
+            creationDate: Int(todoItem.createdDate.timeIntervalSince1970),
+            modificationDate: Int((todoItem.dateOfChange ?? todoItem.createdDate).timeIntervalSince1970),
+            lastUpdatedBy: deviceID
+        )
+    }
     
-    private func mapData(element: ToDoItemDTO) -> ToDoItem? {
+    private func mapData(element: ElementDTO) -> ToDoItem? {
         guard
-            let id = element.id ,
-            let importance = Importance(rawValue: element.importance)
+            let id = UUID(uuidString: element.id),
+            let importance = Importance(rawValue: element.importance),
+            let textColor = element.color
         else {
             return nil
         }
         
-        let creationDate = Date(timeIntervalSince1970: TimeInterval(element.createdAt))
+        let creationDate = Date(timeIntervalSince1970: TimeInterval(element.creationDate))
         let deadline = element.deadline.map { Date(timeIntervalSince1970: TimeInterval($0)) }
-        let modificationDate = Date(timeIntervalSince1970: TimeInterval(element.changedAt))
+        let modificationDate = Date(timeIntervalSince1970: TimeInterval(element.modificationDate))
         
         return ToDoItem(
-            id: id,
+            id: id.uuidString,
             text: element.text,
             importance: importance,
             deadline: deadline,
-            isDone: element.isDone,
+            isDone: element.done,
             createdDate: creationDate,
             dateOfChange: modificationDate
         )
@@ -197,16 +256,33 @@ class DefaultNetworkingService: NetworkingService {
     
 }
 
-enum NetworkingError: Error {
-    case requestFailed
-    case badURL
-    case impossinbleToDecode
+enum RequestError: Error {
+    case wrongURL(URLComponents)
+    case unexpectedResponse
+    case badRequest
+    case wrongAuth
+    case notFound
+    case serverError
+    case unexpectedStatusCode(Int)
 }
 
-enum HTTPMethod : String {
-    case get  = "GET"
-    case post = "POST"
-    case put  = "PUT"
-    case patch = "PATCH"
-    case delete = "DELETE"
+extension RequestError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .wrongURL(let urlComponents):
+            return "Could not construct url with components: \(urlComponents)"
+        case .unexpectedResponse:
+            return "Unexpected response from server"
+        case .badRequest:
+            return "Wrong request or unsynchronized data"
+        case .wrongAuth:
+            return "Wrong authorization"
+        case .notFound:
+            return "Element not found"
+        case .serverError:
+            return "Server error"
+        case .unexpectedStatusCode(let code):
+            return "Unexpected status code: \(code)"
+        }
+    }
 }

@@ -2,7 +2,7 @@ import UIKit
 
 @MainActor
 class ViewController: UIViewController, AddItemDelegate {
-    
+    @MainActor
     func newTask(item: ToDoItem) {
         if checkNewItem {
             file.add(todoItem: item)
@@ -16,7 +16,7 @@ class ViewController: UIViewController, AddItemDelegate {
             checkStatus()
         }
     }
-
+    @MainActor
     func didDelete(_: AddTodoController, item: ToDoItem) {
         file.remove(id: item.id)
         file.saveToJSONFile()
@@ -26,7 +26,7 @@ class ViewController: UIViewController, AddItemDelegate {
     
     var updateItemID: String = ""
     var checkNewItem = false
-    let network: NetworkingService = DefaultNetworkingService()
+    let network: NetworkingService = DefaultNetworkingService(deviceID: "Mac")
     private lazy var tableView = makeTableView()
     private lazy var completed = makeCompleted()
     private lazy var show = makeShow()
@@ -52,7 +52,7 @@ class ViewController: UIViewController, AddItemDelegate {
             do {
                 let todoList = try await self.network.getItemList()
                 self.data = todoList
-                print(todoList)
+                checkStatus()
             } catch {
                 self.isDirty = true
             }
@@ -88,6 +88,7 @@ class ViewController: UIViewController, AddItemDelegate {
             Task {
                 do {
                     _ = try await network.postElement(with: item)
+                    loadTodoList()
                     self.isDirty = false
                 } catch {
                     self.isDirty = true
@@ -103,7 +104,8 @@ class ViewController: UIViewController, AddItemDelegate {
 
             Task {
                 do {
-                    _ = try await network.putElement(by: item.id)
+                    _ = try await network.putElement(by: item)
+                    loadTodoList()
                     self.isDirty = false
                 } catch {
                     self.isDirty = true
@@ -347,6 +349,7 @@ extension ViewController: UITableViewDelegate {
         let actionRemove = UIContextualAction(style: .destructive, title: "") { (_, _, completionHandler) in
             let id = self.displayedData[indexPath.row].id
             self.file.remove(id: id)
+            self.deleteToDoNetwork(id: id)
             self.file.saveToJSONFile()
             self.checkStatus()
             
@@ -360,8 +363,9 @@ extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let actionDone = UIContextualAction(style: .normal, title: "") { (_, _, completionHandler) in
             let id = self.displayedData[indexPath.row].id
-            self.file.completedTask(id: id)
-            self.file.saveToJSONFile()
+            let item = self.file.completedTask(id: id)
+            print(item)
+            self.changeToDoNetwork(item: item)
             self.checkStatus()
             completionHandler(true)
         }

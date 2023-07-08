@@ -171,25 +171,25 @@ extension ToDoItem {
     }
 }
 
-extension ToDoItem {
-    static func convertFromDTO(dto: ToDoItemDTO) -> ToDoItem {
-        if let deadline = dto.deadline {
-            return ToDoItem(id: dto.id ?? UUID().uuidString,
-                            text: dto.text,
-                            importance: Importance(rawValue: dto.importance) ?? .normal,
-                            deadline: Date(timeIntervalSince1970: TimeInterval(deadline)),
-                            isDone: dto.isDone,
-                            createdDate: Date(timeIntervalSince1970: TimeInterval(dto.createdAt)),
-                            dateOfChange: Date(timeIntervalSince1970: TimeInterval(dto.changedAt))
-            )
-        }
-        return ToDoItem(id: dto.id ?? UUID().uuidString,
-                        text: dto.text,
-                        importance: Importance(rawValue: dto.importance) ?? .normal,
-                        deadline: nil,
-                        isDone: dto.isDone,
-                        createdDate: Date(timeIntervalSince1970: TimeInterval(dto.createdAt)),
-                        dateOfChange: Date(timeIntervalSince1970: TimeInterval(dto.changedAt))
-            )
-    }
-}
+//extension ToDoItem {
+//    static func convertFromDTO(dto: ToDoItemDTO) -> ToDoItem {
+//        if let deadline = dto.deadline {
+//            return ToDoItem(id: dto.id ?? UUID().uuidString,
+//                            text: dto.text,
+//                            importance: Importance(rawValue: dto.importance) ?? .normal,
+//                            deadline: Date(timeIntervalSince1970: TimeInterval(deadline)),
+//                            isDone: dto.isDone,
+//                            createdDate: Date(timeIntervalSince1970: TimeInterval(dto.createdAt)),
+//                            dateOfChange: Date(timeIntervalSince1970: TimeInterval(dto.changedAt))
+//            )
+//        }
+//        return ToDoItem(id: dto.id ?? UUID().uuidString,
+//                        text: dto.text,
+//                        importance: Importance(rawValue: dto.importance) ?? .normal,
+//                        deadline: nil,
+//                        isDone: dto.isDone,
+//                        createdDate: Date(timeIntervalSince1970: TimeInterval(dto.createdAt)),
+//                        dateOfChange: Date(timeIntervalSince1970: TimeInterval(dto.changedAt))
+//            )
+//    }
+//}

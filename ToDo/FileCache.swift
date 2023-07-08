@@ -92,10 +92,15 @@ final class FileCache {
         }
     }
     
-    func completedTask(id: String) {
-        guard let index = todoItems.firstIndex(where: { $0.id == id }) else { return }
+    func completedTask(id: String) -> ToDoItem {
+        guard let index = todoItems.firstIndex(where: { $0.id == id }) else {
+            print("No existing file found at \(filepath)")
+            return ToDoItem(text: "")
+        }
         todoItems[index].isDone = true
+        return todoItems[index]
     }
+    
     
     func notCompleteTask(id: String) {
         guard let index = todoItems.firstIndex(where: { $0.id == id }) else { return }
