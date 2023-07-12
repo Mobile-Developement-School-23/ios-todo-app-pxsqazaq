@@ -101,7 +101,6 @@ final class FileCache {
         return todoItems[index]
     }
     
-    
     func notCompleteTask(id: String) {
         guard let index = todoItems.firstIndex(where: { $0.id == id }) else { return }
         todoItems[index].isDone = false
@@ -135,4 +134,26 @@ extension FileCache {
             todoItems = ToDoItem.parse(csv: csvString)
         }
     }
+}
+// MARK: - SQLite part
+
+extension FileCache {
+    
+    func loadFromSQLite() -> [ToDoItem] {
+        todoItems = SQLiteManager.shared.load()
+        return todoItems
+    }
+    
+    func addToSQLite(item: ToDoItem) {
+        SQLiteManager.shared.insert(todoItem: item)
+    }
+    
+    func updateInSQLite(item: ToDoItem) {
+        SQLiteManager.shared.update(updatedItem: item)
+    }
+    
+    func deleteInSQLite(id: String) {
+        SQLiteManager.shared.delete(id: id)
+    }
+    
 }

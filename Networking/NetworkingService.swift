@@ -84,7 +84,6 @@ final class DefaultNetworkingService: NetworkingService {
     @discardableResult
     func postElement(with todoItem: ToDoItem) async throws -> ToDoItem? {
         let todoItemDTO = TodoItemDTO(element: mapData(todoItem: todoItem))
-        print(todoItemDTO)
         let requestBody = try JSONEncoder().encode(todoItemDTO)
         let request = try makePostRequest(path: "/\(Configuration.path)/list", body: requestBody)
         let (data, _) = try await performRequest(request)
@@ -100,10 +99,7 @@ final class DefaultNetworkingService: NetworkingService {
         let todoItemDTO = TodoItemDTO(element: mapData(todoItem: todoItem))
         print(todoItemDTO)
         let requestBody = try JSONEncoder().encode(todoItemDTO)
-        let request = try makePutRequest(
-            path: "/\(Configuration.path)/list/\(todoItem.id)",
-            body: requestBody
-        )
+        let request = try makePutRequest(path: "/\(Configuration.path)/list\(todoItemDTO.element.id)", body: requestBody)
         let (data, _) = try await performRequest(request)
         let response = try JSONDecoder().decode(TodoItemDTO.self, from: data)
         if let revision = response.revision {

@@ -5,22 +5,30 @@ class ViewController: UIViewController, AddItemDelegate {
     @MainActor
     func newTask(item: ToDoItem) {
         if checkNewItem {
-            file.add(todoItem: item)
-            file.saveToJSONFile()
-            addToDoNetwork(item: item)
+            file.addToSQLite(item: item)
+            file.loadFromSQLite()
+//            file.add(todoItem: item)
+//            file.saveToJSONFile()
+//            addToDoNetwork(item: item)
             checkStatus()
         } else {
-            file.update(id: updateItemID, text: item.text, importance: item.importance, deadline: item.deadline)
-            file.saveToJSONFile()
-            changeToDoNetwork(item: item)
+//            file.update(id: updateItemID, text: item.text, importance: item.importance, deadline: item.deadline)
+//            file.saveToJSONFile()
+            let task = ToDoItem(id: updateItemID, text: item.text, importance: item.importance, deadline: item.deadline)
+            file.updateInSQLite(item: task)
+            file.loadFromSQLite()
+//            changeToDoNetwork(item: task)
             checkStatus()
         }
     }
     @MainActor
     func didDelete(_: AddTodoController, item: ToDoItem) {
-        file.remove(id: item.id)
-        file.saveToJSONFile()
-        deleteToDoNetwork(id: item.id)
+        file.deleteInSQLite(id: item.id)
+        file.loadFromSQLite()
+//        file.remove(id: item.id)
+//        file.saveToJSONFile()
+//        deleteToDoNetwork(id: item.id)
+        
         checkStatus()
     }
     
@@ -30,7 +38,7 @@ class ViewController: UIViewController, AddItemDelegate {
     private lazy var tableView = makeTableView()
     private lazy var completed = makeCompleted()
     private lazy var show = makeShow()
-    var data: [ToDoItem] = []
+//    var data: [ToDoItem] = []
     var displayedData: [ToDoItem] = [] {
         didSet {
             tableView.reloadData()
@@ -42,89 +50,24 @@ class ViewController: UIViewController, AddItemDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadTodoList()
+//        SQLiteManager.shared.createTable()
+        file.loadFromSQLite()
+        checkStatus()
         setupUI()
     }
     
-    private func loadTodoList() {
-        Task(priority: .userInitiated) { [weak self] in
-            guard let self = self else { return }
-            do {
-                let todoList = try await self.network.getItemList()
-                self.data = todoList
-                checkStatus()
-            } catch {
-                self.isDirty = true
-            }
-        }
-    }
-    
-    func deleteToDoNetwork(id: String) {
-        
-        guard let itemIndex = data.firstIndex(where: { $0.id == id })
-        else { return }
-        data.remove(at: itemIndex)
-
-            if self.isDirty {
-                loadTodoList()
-            }
-
-            Task {
-                do {
-                    _ = try await network.deleteElement(by: id)
-                    self.isDirty = false
-                } catch {
-                    self.isDirty = true
-                }
-            }
-        }
-    
-    func addToDoNetwork(item: ToDoItem) {
-
-            if self.isDirty {
-                loadTodoList()
-            }
-
-            Task {
-                do {
-                    _ = try await network.postElement(with: item)
-                    loadTodoList()
-                    self.isDirty = false
-                } catch {
-                    self.isDirty = true
-                }
-            }
-        }
-
-        func changeToDoNetwork(item: ToDoItem) {
-
-            if self.isDirty {
-                loadTodoList()
-            }
-
-            Task {
-                do {
-                    _ = try await network.putElement(by: item)
-                    loadTodoList()
-                    self.isDirty = false
-                } catch {
-                    self.isDirty = true
-                }
-            }
-        }
-    
     private func updateCompletedCount() {
-        let completedCount = data.filter { $0.isDone == true }.count
+        let completedCount = file.todoItems.filter { $0.isDone == true }.count
         completedTasks = completedCount
         completed.text = "Выполнено — \(completedTasks)"
     }
     
     private func showNotCompletedTasks() {
-        displayedData = data.filter { $0.isDone == false }
+        displayedData = file.todoItems.filter { $0.isDone == false }
     }
     
     private func showAllTasks() {
-        displayedData = data
+        displayedData = file.todoItems
     }
     
     private func makeTableView() -> UITableView {
@@ -192,9 +135,9 @@ class ViewController: UIViewController, AddItemDelegate {
     
     private func checkStatus() {
         if self.show.titleLabel?.text == "Показать" {
-            self.displayedData = self.data.filter { $0.isDone == false }
+            self.displayedData = self.file.todoItems.filter { $0.isDone == false }
         } else {
-            self.displayedData = self.data
+            self.displayedData = self.file.todoItems
         }
     }
     
@@ -348,9 +291,11 @@ extension ViewController: UITableViewDelegate {
         
         let actionRemove = UIContextualAction(style: .destructive, title: "") { (_, _, completionHandler) in
             let id = self.displayedData[indexPath.row].id
-            self.file.remove(id: id)
-            self.deleteToDoNetwork(id: id)
-            self.file.saveToJSONFile()
+            self.file.deleteInSQLite(id: id)
+            self.file.loadFromSQLite()
+//            self.file.remove(id: id)
+//            self.deleteToDoNetwork(id: id)
+//            self.file.saveToJSONFile()
             self.checkStatus()
             
             completionHandler(true)
@@ -364,8 +309,9 @@ extension ViewController: UITableViewDelegate {
         let actionDone = UIContextualAction(style: .normal, title: "") { (_, _, completionHandler) in
             let id = self.displayedData[indexPath.row].id
             let item = self.file.completedTask(id: id)
-            print(item)
-            self.changeToDoNetwork(item: item)
+            self.file.updateInSQLite(item: item)
+            self.file.loadFromSQLite()
+//            self.changeToDoNetwork(item: item)
             self.checkStatus()
             completionHandler(true)
         }
