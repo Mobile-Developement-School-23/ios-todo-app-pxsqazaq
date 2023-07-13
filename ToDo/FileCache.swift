@@ -32,11 +32,13 @@ final class FileCache {
         todoItems.append(todoItem)
     }
     
-    func update(id: String, text: String, importance: Importance, deadline: Date?) {
-        guard let index = todoItems.firstIndex(where: { $0.id == id }) else { return }
+    func update(id: String, text: String, importance: Importance, deadline: Date?) -> ToDoItem? {
+        guard let index = todoItems.firstIndex(where: { $0.id == id }) else { return nil}
         todoItems[index].text = text
         todoItems[index].importance = importance
         todoItems[index].deadline = deadline
+        todoItems[index].dateOfChange = Date()
+        return todoItems[index]
     }
     
     func remove(id: String) {

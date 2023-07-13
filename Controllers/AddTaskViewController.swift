@@ -15,6 +15,7 @@ class AddTodoController: UIViewController {
     
     // MARK: - Properties
     var delegate: AddItemDelegate?
+    private let coreDataStack: CoreDataStack = .init(modelName: "contents")
         
     private enum Constants {
         static let cancelTitle = "Отменить"

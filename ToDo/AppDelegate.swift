@@ -16,6 +16,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    lazy var coreDataStack: CoreDataStack = .init(modelName: "contents")
+
+       static let sharedAppDelegate: AppDelegate = {
+           guard let delegate = UIApplication.shared.delegate as? AppDelegate else {
+               fatalError("Unexpected app delegate type, did it change? \(String(describing: UIApplication.shared.delegate))")
+           }
+           return delegate
+       }()
+    
     // MARK: UISceneSession Lifecycle
     
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
