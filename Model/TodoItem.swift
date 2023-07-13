@@ -16,7 +16,7 @@ struct ToDoItem {
     var deadline: Date?
     var isDone: Bool
     let createdDate: Date
-    let dateOfChange: Date?
+    var dateOfChange: Date?
     
     init(id: String = UUID().uuidString, text: String, importance: Importance = .normal, deadline: Date? = nil, isDone: Bool = false, createdDate: Date = Date(), dateOfChange: Date? = nil) {
         self.id = id

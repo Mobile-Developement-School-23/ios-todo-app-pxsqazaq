@@ -15,6 +15,7 @@ class AddTodoController: UIViewController {
     
     // MARK: - Properties
     var delegate: AddItemDelegate?
+    private let coreDataStack: CoreDataStack = .init(modelName: "contents")
         
     private enum Constants {
         static let cancelTitle = "Отменить"
@@ -211,7 +212,6 @@ class AddTodoController: UIViewController {
         switch selector {
         case navigationItem.leftBarButtonItem:
             presentingViewController?.dismiss(animated: true, completion: nil)
-            print("Cancel button tapped")
         case navigationItem.rightBarButtonItem:
             delegate?.newTask(item: ToDoItem(text: textView.text, importance: presentationModel.importance, deadline: presentationModel.dueDate))
             presentingViewController?.dismiss(animated: true, completion: nil)
